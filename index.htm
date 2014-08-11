@@ -1,0 +1,116 @@
+<!DOCTYPE html> 
+<html> 
+<head>
+<style>
+body{margin:10px auto;background: #000;width:900px;}
+#container{width:860px;height:350px;background:url(files/container_bg.png) repeat-x;margin:0px;padding:0px;border:10px solid #550;}
+#box{width:20px;height:20px;background-image:url('files/box.png');background-repeat:no-repeat;margin:0px;padding:0px;z-index:90;
+position:relative;left:200px;top:50px;}
+#sticks{position: absolute;z-index:100;}
+.stick{height:350px;width:20px;background-image:url('files/stick.png');background-repeat:no-repeat;float:left;margin-right:20px;}
+#message{color:#fff;text-align:center;margin-top:20px;font-size:24px;}
+#info{color:#fff;text-align:center;margin-top:10px;font-size:14px;}
+#left{float:left;width:600px;}
+#right{float:right;width:300px;color:#fff;margin-top:10px;}
+.score{font-size:22px;font-weight:bold;}
+.try{font-size:16px;font-weight:bold;}
+#check{color:#fff;}
+</style>
+<script src="files/jquery-1.7.2.min.js"></script>
+</head
+<body>
+<h1 id='check'>First Extract the ZIP file and Enable JavaScript</h1>
+<div id="container">
+<div id="sticks">
+<div class="stick" id="stick1"></div><div class="stick" id="stick2"></div><div class="stick" id="stick3"></div><div class="stick" id="stick4"></div><div class="stick" id="stick5"></div><div class="stick" id="stick6"></div><div class="stick" id="stick7"></div><div class="stick" id="stick8"></div><div class="stick" id="stick9"></div><div class="stick" id="stick10"></div><div class="stick" id="stick11"></div><div class="stick" id="stick12"></div><div class="stick" id="stick13"></div><div class="stick" id="stick14"></div><div class="stick" id="stick15"></div><div class="stick" id="stick16"></div><div class="stick" id="stick17"></div><div class="stick" id="stick18"></div><div class="stick" id="stick19"></div><div class="stick" id="stick20"></div><div class="stick" id="stick21"></div><div class="stick" id="stick22"></div>
+</div>
+<div id="box"></div>
+</div>
+<div id="left">
+<div id="message">Find the BUG!!..<img src='files/bug.png' width='40' height='40' /> <button id="start" onclick="startGame()">START</button></div>
+<div id="info">( when the BUG stops flying... click on the bamboo to find the BUG. )</div>
+</div>
+<div id="right"><br/>
+<span class='score'>Score : </span><span class='score' id="score">0</span><br/><br/>
+<span class='try'>Remaining Try : </span><span class='try' id="try">10</span>
+</div>
+<script>
+var xFlag=true,yFlag=true,boxMove=true;
+var score=0,tries=10;
+var boxX=$("#box").offset().left-$("#container").offset().left;
+var boxY=$("#box").offset().top-$("#container").offset().top;
+function moveBox(){
+	if(boxMove){
+		if(boxX<20||((boxX+parseInt($("#box").css("width").replace("px","")))>(parseInt($("#container").css("width").replace("px",""))-20))){
+			xFlag=!xFlag;
+		}
+		if(boxY<20||((boxY+parseInt($("#box").css("height").replace("px","")))>(parseInt($("#container").css("height").replace("px","")))-20)){
+			yFlag=!yFlag;
+		}
+		if(xFlag){boxX+=20;}else{boxX-=20;}
+		if(yFlag){boxY+=20;}else{boxY-=20;}
+		$("#box").css({"left":boxX,"top":boxY});
+		setTimeout("moveBox()",20);
+	}
+}
+var boxStick=0;
+function stopBox(){
+	boxMove=false;
+	var stick1X=$("#stick1").offset().left;
+	//alert((stick1X-$("#container").offset().left)+"==="+(boxX+10));
+	if(Math.floor((boxX+10)/20)%2==0){
+		boxPos=(Math.floor((boxX+10)/20))*20;//+(stick1X-$("#container").offset().left);
+	}else{
+		if(xFlag){
+			boxPos=(Math.floor((boxX+10)/20)+1)*20;//+(stick1X-$("#container").offset().left);
+		}else{
+			boxPos=(Math.floor((boxX+10)/20)-1)*20;//+(stick1X-$("#container").offset().left);
+		}
+	}
+	$("#box").css({"left":boxPos});
+	//alert(boxPos+"=="+(Math.floor(boxPos/40)+1));
+	boxStick=Math.floor(boxPos/40)+1;
+}
+var stickFlag=false;
+$(document).ready(function(){
+	
+});
+function startGame(){
+	score=0;tries=10;
+	$("#score").html("0");$("#try").html("10");
+	$(".stick").css({"background-image":"url('files/stick.png')"});
+	$('#message').html("Find the BUG...<img src='files/bug.png' width='40' height='40' />");
+	boxMove=true;
+	moveBox();
+	setTimeout("stopBox()",Math.random()*3000+2000);$("#start").hide();
+}
+$(".stick").click(function(){
+	if(!boxMove){
+		//$(this).slideUp().css({"background":"transparent"});;
+		$(this).css({"background":"transparent"});
+		var stickId=parseInt($(this).attr("id").substr(5));
+		if(stickId==boxStick){
+			score++;
+			$("#score").html(score);
+			$("#message").html("Well done!!..<img src='files/bug.png' width='40' height='40' />");
+			setTimeout("$(\".stick\").css({\"background-image\":\"url('files/stick.png')\"});$('#message').html(\"Find the BUG...<img src='files/bug.png' width='40' height='40' />\");boxMove=true;moveBox();",1000);			
+			setTimeout("stopBox()",Math.random()*3000+2000);
+		}else{
+			if(tries==0){
+				$("#message").html("Game Over!!.. Score : "+score+" <button id='start' onclick='startGame()'>RESTART</button>");
+				//$("#start").show();
+			}else{
+				tries--;
+				$("#try").html(tries);
+				//alert("Try Again..");
+				$("#message").html("Oops.. Check another bamboo...<img src='files/bug.png' width='40' height='40' />");
+			}	
+		}
+		//alert(stickId+"=="+boxStick);
+	}
+	//alert($(this).offset().left);
+});
+</script>
+<script src="files/check.js"></script>
+</body>
+</html>
